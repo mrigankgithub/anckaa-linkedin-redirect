@@ -1,74 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Redirecting to Anckaa App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8">
+    <title>LinkedIn Redirect</title>
+  </head>
+  <body>
     <script>
-        // Extract LinkedIn OAuth parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const error = urlParams.get('error');
-        const state = urlParams.get('state');
-        
-        console.log('LinkedIn redirect received:', { code, error, state });
-        
-        // Redirect back to your app
-        if (code) {
-            console.log('Redirecting with authorization code');
-            window.location.href = `anka://linkedin-auth?code=${code}${state ? '&state=' + state : ''}`;
-        } else if (error) {
-            console.log('Redirecting with error:', error);
-            const errorDescription = urlParams.get('error_description');
-            window.location.href = `anka://linkedin-auth?error=${error}${errorDescription ? '&error_description=' + encodeURIComponent(errorDescription) : ''}`;
-        } else {
-            console.log('No parameters found, redirecting to app');
-            window.location.href = 'anka://linkedin-auth';
-        }
-    </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: inline-block;
-        }
-        a {
-            color: #0066cc;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Redirecting to Anckaa App...</h2>
-        <p>Please wait while we redirect you back to the Anckaa application.</p>
-        <p>If you are not redirected automatically, <a href="anka://linkedin-auth" id="manualLink">click here</a>.</p>
-    </div>
-    
-    <!-- Fallback for JavaScript-disabled browsers -->
-    <noscript>
-        <meta http-equiv="refresh" content="2;url=anka://linkedin-auth" />
-        <div class="container">
-            <h2>JavaScript Required</h2>
-            <p>Please enable JavaScript or <a href="anka://linkedin-auth">click here</a> to continue to the Anckaa app.</p>
-        </div>
-    </noscript>
+      // Get query params from LinkedIn response
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+      const state = params.get("state");
+      const error = params.get("error");
 
-    <script>
-        // Add fallback timer
-        setTimeout(function() {
-            document.getElementById('manualLink').textContent = 'Click here (redirect taking too long)';
-        }, 3000);
+      // Construct deep link back to app
+      let redirectUrl = "anckaa://linkedin-auth";
+
+      if (code) {
+        redirectUrl += "?code=" + code + "&state=" + state;
+      } else if (error) {
+        redirectUrl += "?error=" + error + "&error_description=" + params.get("error_description");
+      }
+
+      // Redirect user into your app
+      window.location.href = redirectUrl;
     </script>
-</body>
+    <p>Redirecting to app…</p>
+  </body>
 </html>
