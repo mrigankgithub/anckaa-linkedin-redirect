@@ -1,29 +1,26 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>LinkedIn Redirect</title>
-  </head>
-  <body>
-    <script>
-      // Get query params from LinkedIn response
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get("code");
-      const state = params.get("state");
-      const error = params.get("error");
+<head>
+  <meta charset="UTF-8" />
+  <title>LinkedIn Redirect</title>
+  <script>
+    // Extract query params from LinkedIn redirect
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const state = params.get("state");
+    const error = params.get("error");
 
-      // Construct deep link back to app
-      let redirectUrl = "anckaa://linkedin-auth";
-
-      if (code) {
-        redirectUrl += "?code=" + code + "&state=" + state;
-      } else if (error) {
-        redirectUrl += "?error=" + error + "&error_description=" + params.get("error_description");
-      }
-
-      // Redirect user into your app
-      window.location.href = redirectUrl;
-    </script>
-    <p>Redirecting to app…</p>
-  </body>
+    // Redirect to app's custom scheme with params
+    if (code) {
+      window.location.href = `anckaa://linkedin-auth?code=${code}&state=${state}`;
+    } else if (error) {
+      window.location.href = `anckaa://linkedin-auth?error=${error}`;
+    } else {
+      document.body.innerText = "Invalid redirect.";
+    }
+  </script>
+</head>
+<body>
+  Redirecting to app...
+</body>
 </html>
