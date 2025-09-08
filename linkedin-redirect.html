@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Anckaa Auth</title>
+  <title>Anckaa Auth</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
-    <p>Please wait while we redirect you back to the app...</p>
+  <p>Please wait while we redirect you back to the app...</p>
 
-    <script>
-        // Get the full URL from the browser's address bar
-        const url = window.location.href;
-        
-        // Use URLSearchParams to easily get the 'code' parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
+  <script>
+    (function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      const error = urlParams.get("error");
 
-        if (code) {
-            // ✅ This is the deep link URL that will open your app
-            const deepLinkUrl = `anckaa://linkedin-auth?code=${code}`;
-            alert(deepLinkUrl)
-            // This is the command that triggers the app to open
-            window.location.replace(deepLinkUrl);
-        } else {
-            // Handle cases where the code is not present (e.g., login was canceled or failed)
-            const error = urlParams.get('error');
-            console.error('LinkedIn authentication failed:', error);
-            document.body.innerHTML = '<h1>Authentication Failed</h1><p>Please try logging in again.</p>';
-        }
-    </script>
+      if (code) {
+        // Redirect back into the app with code
+        window.location.replace(`anckaa://linkedin-auth?code=${code}`);
+      } else if (error) {
+        // Redirect back into the app with error
+        window.location.replace(`anckaa://linkedin-auth?error=${error}`);
+      } else {
+        document.body.innerHTML = `
+          <h1>Authentication Failed</h1>
+          <p>No code or error received from LinkedIn.</p>
+        `;
+      }
+    })();
+  </script>
 </body>
 </html>
