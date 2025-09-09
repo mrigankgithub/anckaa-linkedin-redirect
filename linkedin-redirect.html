@@ -1,31 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Anckaa Auth</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinkedIn Redirect</title>
+    <script type="text/javascript">
+        // This script will run when the page loads
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state'); // LinkedIn also sends a state parameter
+
+            if (code) {
+                // Construct your deep link to send the code back to your app
+                const deepLinkUrl = `anckaa://linkedin-auth?code=${code}&state=${state}`;
+                window.location.replace(deepLinkUrl); // Use replace to avoid history issues
+            } else {
+                // Handle errors if LinkedIn sends them back to this page
+                const error = urlParams.get('error');
+                const error_description = urlParams.get('error_description');
+                const deepLinkUrl = `anckaa://linkedin-auth?error=${error}&error_description=${error_description}`;
+                window.location.replace(deepLinkUrl);
+            }
+        };
+    </script>
 </head>
 <body>
-  <p>Please wait while we redirect you back to the app...</p>
-
-  <script>
-    (function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
-      const error = urlParams.get("error");
-
-      if (code) {
-        // Redirect back into the app with code
-        window.location.replace(`anckaa://linkedin-auth?code=${code}`);
-      } else if (error) {
-        // Redirect back into the app with error
-        window.location.replace(`anckaa://linkedin-auth?error=${error}`);
-      } else {
-        document.body.innerHTML = `
-          <h1>Authentication Failed</h1>
-          <p>No code or error received from LinkedIn.</p>
-        `;
-      }
-    })();
-  </script>
+    <p>Redirecting you back to the Anckaa app...</p>
 </body>
 </html>
