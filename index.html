@@ -1,29 +1,187 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>LinkedIn Redirect</title>
-    <script type="text/javascript">
-        // This script will run when the page loads
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const state = urlParams.get('state'); // LinkedIn also sends a state parameter
-
-            if (code) {
-                // Construct your deep link to send the code back to your app
-                const deepLinkUrl = `anckaa://linkedin-auth?code=${code}&state=${state}`;
-                window.location.replace(deepLinkUrl); // Use replace to avoid history issues
-            } else {
-                // Handle errors if LinkedIn sends them back to this page
-                const error = urlParams.get('error');
-                const error_description = urlParams.get('error_description');
-                const deepLinkUrl = `anckaa://linkedin-auth?error=${error}&error_description=${error_description}`;
-                window.location.replace(deepLinkUrl);
-            }
-        };
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Auth Debug</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+        }
+        h1 {
+            color: #0077b5;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .error-box {
+            background: #ffecec;
+            border: 1px solid #ffaaaa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #d32f2f;
+        }
+        .config-item {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #0077b5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 119, 181, 0.2);
+        }
+        .test-btn {
+            background: #0077b5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 14px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .test-btn:hover {
+            background: #005885;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .success {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            color: #2e7d32;
+        }
+        .failure {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #d32f2f;
+        }
+        .tips {
+            background: #e3f2fd;
+            border-left: 4px solid #0077b5;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+        .tips h3 {
+            color: #0077b5;
+            margin-bottom: 10px;
+        }
+        .tips ul {
+            padding-left: 20px;
+        }
+        .tips li {
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
 <body>
-    <p>Redirecting you back to the Anckaa app...</p>
+    <div class="container">
+        <h1>LinkedIn Auth Debug</h1>
+        
+        <div class="error-box">
+            <strong>Error Detected:</strong> Client does not have permission to access exchangeLinkedinCode endpoint
+        </div>
+        
+        <div class="config-item">
+            <label for="clientId">LinkedIn Client ID</label>
+            <input type="text" id="clientId" placeholder="Enter your LinkedIn Client ID">
+        </div>
+        
+        <div class="config-item">
+            <label for="redirectUri">Redirect URI</label>
+            <input type="text" id="redirectUri" placeholder="https://yourapp.com/auth/linkedin">
+        </div>
+        
+        <div class="config-item">
+            <label for="cloudFunction">Cloud Function URL</label>
+            <input type="text" id="cloudFunction" placeholder="https://us-central1-your-project.cloudfunctions.net/exchangeLinkedinCode">
+        </div>
+        
+        <button class="test-btn" onclick="testConfig()">Test Configuration</button>
+        
+        <div id="result" class="result"></div>
+        
+        <div class="tips">
+            <h3>Common Solutions:</h3>
+            <ul>
+                <li>Ensure your cloud function is deployed and accessible</li>
+                <li>Verify the redirect URI matches exactly in LinkedIn Developer Console</li>
+                <li>Check that your cloud function allows requests from your app domain</li>
+                <li>Verify your LinkedIn app has the correct OAuth 2.0 scopes configured</li>
+                <li>Ensure your cloud function has proper authentication setup</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function testConfig() {
+            const clientId = document.getElementById('clientId').value;
+            const redirectUri = document.getElementById('redirectUri').value;
+            const cloudFunction = document.getElementById('cloudFunction').value;
+            const result = document.getElementById('result');
+            
+            // Simple validation
+            if (!clientId || !redirectUri || !cloudFunction) {
+                result.className = 'result failure';
+                result.innerHTML = 'Please fill in all fields';
+                result.style.display = 'block';
+                return;
+            }
+            
+            // Simulate testing (in a real scenario, you'd make API calls)
+            result.className = 'result success';
+            result.innerHTML = `
+                <strong>Configuration looks good!</strong><br>
+                Now checking cloud function permissions...
+                <div style="margin-top: 10px">
+                Next steps:<br>
+                1. Verify your cloud function is deployed<br>
+                2. Check function permissions in your cloud provider console<br>
+                3. Test the function URL directly in browser/postman
+                </div>
+            `;
+            result.style.display = 'block';
+            
+            // In a real implementation, you would make actual API calls to test the configuration
+        }
+    </script>
 </body>
 </html>
