@@ -36,7 +36,7 @@
       const clientId = "86bpuvvxaesbd9";
       const redirectUri = "https://us-central1-anckaa-c105f.cloudfunctions.net/exchangeLinkedInCode";
       const state = "secureRandomState"; // ideally generate this dynamically
-      const scope = "opeinid email profile";
+      const scope = "openid email profile";
 
       const authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
 
